@@ -1,0 +1,159 @@
+	<!--
+	Name: Smitkumar Patel
+	StudentID: 000737859
+	Lab 4:  React TODO List
+	-->
+	<!DOCTYPE html>
+	<html>
+	<head>
+	  <meta charset="UTF-8" />
+	  <title>ToDO List ReactJS</title>
+	  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+	  <script type="text/javascript">
+	  const buttonClick = {
+		color: 'black',
+		border: '2px solid black',
+		padding: '15px 22px',
+		margin: '10px 0',
+		cursor: 'pointer',
+		backgroundColor: 'lightpink'
+	};
+	const divDesign = {
+		fontFamily: 'Calibri',
+		height: '98vh',
+		width: '60%',
+		margin: 'auto',
+		backgroundColor: 'mediumorchid',
+		overflow: 'auto'
+	};
+	const inputDesign = {
+		width: '60%',
+		padding: '13px 24px',
+		margin: '8px 8px',
+		display: 'inline-block',
+		border: '2px solid black',
+		boxSizing: 'border-box'
+	};
+	const button = {
+		color: 'black',
+		padding: '7px 7px',
+		margin: '8px 8px',
+		border: '2px black solid',
+		cursor: 'pointer',
+		backgroundColor: 'lightpink'
+	};</script>
+	</head>
+	<body>
+	  <div id="ReactApplication" style="background-color: lightslategray;"></div>
+	  <script type="text/babel">
+		class ReactAppList extends React.Component {
+		  constructor(props){
+			super(props);
+			this.insertTask = this.insertTask.bind(this);
+			this.differenceInput = this.differenceInput.bind(this);
+			this.taskDelete = this.taskDelete.bind(this);
+			this.taskEdit = this.taskEdit.bind(this);
+			this.changeRender = this.changeRender.bind(this);
+			this.state = {
+			  //edit task id
+			  idEdit: 0,
+			  value: "",
+			  // list of tasks
+			  list: [
+				{id: 1, task: "Finish the Assignement"},
+				{id: 2, task: "Watch football game"}
+			  ]
+			};
+		  }
+		  // Different inputs
+		  differenceInput(event){
+			let valNew = event.target.value;
+			this.setState({value: valNew});
+		  }
+		  //Adding the New Task
+		  insertTask(){
+			let listNew = this.state.list;
+			let newId = 1;
+			listNew.forEach(function(e){
+			  if(newId < e.id){
+				newId = e.id;
+			  }
+			});
+			listNew.push({id: newId + 1, task: this.state.value});
+			this.setState({list: listNew, value: ""});
+		  }
+		  // Deleting the task
+		  taskDelete(id){
+			let listNew = this.state.list;
+			let index = listNew.findIndex(function(e){
+			  return e.id == id;
+			});
+			listNew.splice(index, 1);
+			this.setState({list: listNew});
+		  }
+		  // Editing the task
+		  taskEdit(id){
+			let listNew = this.state.list;
+			listNew.forEach(function(e, i){
+			  if(id == e.id){
+				listNew[i].task = this.state.value;
+			  }
+			}.bind(this));
+			this.setState({list: listNew, value: "", idEdit: 0});
+		  }
+		  changeRender(id, task){
+			this.setState({idEdit: id, value: task});
+		  }
+		  render() {
+			return (
+			  <ToDoReact 
+				idEdit={this.state.idEdit} 
+				value={this.state.value} 
+				list={this.state.list} 
+				onChange={this.differenceInput} 
+				insertTask={this.insertTask} 
+				taskDelete={this.taskDelete} 
+				taskEdit={this.taskEdit} 
+				changeRender={this.changeRender} />
+			);
+		  }
+		}
+		class ToDoReact extends React.Component{
+		  renderToDo({id, task}){
+			return (
+			//Buttons for the edit and delete with list of tasks
+			  <li>
+				<span style={{display: 'inline-block', width: '75%'}}>{task}</span> 
+				<button style={button} onClick={this.props.changeRender.bind(this, id, task)}>EDIT</button>
+				<button style={button} onClick={this.props.taskDelete.bind(this, id)}>DELETE[X]</button>
+			  </li>
+			);
+		  }
+		  render(){
+			let button = <button style={buttonClick} onClick={this.props.insertTask}>ADD NEW TASK</button>;
+			if(this.props.idEdit > 0){
+			  button = <button style={buttonClick} onClick={this.props.taskEdit.bind(this, this.props.idEdit)}>EDIT ANY TASK</button>;
+			}
+			return (
+			  <div style={divDesign}>
+				<h1>WELCOME OF REACT TO DO LIST</h1>
+				<div>
+				  <input style={inputDesign} onChange={this.props.onChange} value={this.props.value} />
+				  {button}
+				</div>
+				<ul>
+				  {this.props.list.map(this.renderToDo.bind(this))}
+				</ul>
+			  </div>
+			);
+		  }
+		}
+		ReactDOM.render(
+		  <ReactAppList />,
+		  document.getElementById("ReactApplication")
+		);
+	  </script>
+	</body>
+	</html>
